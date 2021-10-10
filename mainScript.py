@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-
 class Parsebot:
     def __init__(self):
         self.__login = 'login'
@@ -12,6 +11,7 @@ class Parsebot:
         }
         self.__subject = []
         self.__url = "https://schools.dnevnik.ru/marks.aspx?school=35247&index=9&tab=period&homebasededucation=False"
+        self.__homework_url = "https://schools.dnevnik.ru/marks.aspx?school=35247&tab=week"
         self.__login_url = "https://login.dnevnik.ru/"
         self.__header = {
             'Referer': 'https://dnevnik.ru/userfeed'
@@ -63,3 +63,33 @@ class Parsebot:
         all_marks = mark[subj[choice]][:-1]  # Список оценок без среднего балла
         avg = mark[subj[choice]][-1:]  # Средний балл, пока не используется
         return all_marks
+
+    def gethomework(self):
+        with requests.Session() as s:
+            s.post(self.__login_url, data=self.__data)
+            req = s.get(self.__homework_url, headers=self.__header)
+
+            homesoup = BeautifulSoup(req.content, features="lxml")
+
+            hwm = homesoup.find_all('div', class_="col24")
+            test = []
+            for line in hwm:
+                print(line.h3.text)
+                hw = line.find_all('tr')
+                #test.append([item.get_text() for item in hwm[line].select('a')])
+                for line1 in hw:
+                    a = line1.find_all('a')
+                    for b in a:
+                        test.append(b.text.strip())
+                    breakpoint()
+                breakpoint()
+
+
+
+
+
+
+
+ab = Parsebot()
+ab.setuser("dimakok", "Close123!")
+ab.gethomework()
